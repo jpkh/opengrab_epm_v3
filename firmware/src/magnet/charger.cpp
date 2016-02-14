@@ -72,20 +72,7 @@ Charger::Status Charger::runAndGetStatus()
         addErrorFlags(ErrorFlagInputVoltageTooLow);
     }
 
-    if (board::clock::getMonotonic() > deadline_)
-    {
-#if BOARD_OLIMEX_LPC_P11C24
-        return Status::Done;                            // This is just a testing mock
-#endif
-        addErrorFlags(ErrorFlagTimeout);
-    }
-
-    if (error_flags_ != 0)
-    {
-        return Status::Failure;
-    }
-
-    /*
+     /*
      * Calculate on and off time, this will turn into a radom number generator if Vin is out of range
      *
      * This is asuming that the induction is 10uH, thats a bit higher then the datasheet says.
@@ -121,12 +108,14 @@ Charger::Status Charger::runAndGetStatus()
         off_time_cy = 120;
     }
 
-    // Sanity check and run a few cycles
-    if (on_time_cy > 0 && on_time_cy < 30)
+    if(board::getOutVoltageInVolts() < target_output_voltage_)
     {
-        board::runPump(50, on_time_cy, off_time_cy);
+        // Sanity check and run a few cycles
+        if (on_time_cy > 0 && on_time_cy < 30)
+        {
+            board::runPump(4, on_time_cy, off_time_cy);
+        }
     }
-
     return (board::getOutVoltageInVolts() >= target_output_voltage_) ? Status::Done : Status::InProgress;
 }
 

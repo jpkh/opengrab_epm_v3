@@ -127,21 +127,7 @@ void pollOn()
     {
         ; // Nothing to do
     }
-    else if (status == charger::Charger::Status::Done)
-    {
-        board::setMagnetPos();          // The cap is charged, switching the magnet
-        magnet_is_on = true;
 
-        chrg.destroy();                 // Then updating the state
-        remaining_cycles--;
-        health = Health::Ok;
-    }
-    else
-    {
-        chrg.destroy();
-        remaining_cycles = 0;
-        health = Health::Error;
-    }
 }
 
 void pollOff()
@@ -156,34 +142,12 @@ void pollOff()
         chrg.construct<unsigned>(cycle_array_item[0]);
     }
 
+
     const auto status = chrg->runAndGetStatus();
     updateChargerStatusFlags(chrg->getErrorFlags());
-
     if (status == charger::Charger::Status::InProgress)
     {
         ; // Nothing to do
-    }
-    else if (status == charger::Charger::Status::Done)
-    {
-        if (cycle_array_item[1])        // The cap is charged, switching the magnet
-        {
-            board::setMagnetPos();
-        }
-        else
-        {
-            board::setMagnetNeg();
-            magnet_is_on = false;
-        }
-
-        chrg.destroy();
-        remaining_cycles++;
-        health = Health::Ok;
-    }
-    else
-    {
-        chrg.destroy();
-        remaining_cycles = 0;
-        health = Health::Error;
     }
 }
 
