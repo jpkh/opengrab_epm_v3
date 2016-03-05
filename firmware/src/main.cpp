@@ -360,7 +360,7 @@ void init()
     /*
      * Configuring the CAN controller
      */
-    std::uint32_t bit_rate = 0;
+    std::uint32_t bit_rate = 1000000;
     while (bit_rate == 0)
     {
         bit_rate = uavcan_lpc11c24::CanDriver::detectBitRate(&callPollAndResetWatchdog);
